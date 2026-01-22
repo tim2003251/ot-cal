@@ -94,11 +94,11 @@
     <div class="hourly-display">(時薪: <span id="displayHourly">0</span> 元)</div>
 
     <div class="section-title">出勤天數 (填寫總數)</div>
-    <div class="info-text">*系統自動扣除重複的休息日與國定假日</div>
+    <div class="info-text">*系統自動扣除重複的休息日出勤與國定假日</div>
     
     <div class="form-group"><label>日班 (總數)</label><input type="number" id="dayShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
     <div class="form-group"><label>夜班 (總數)</label><input type="number" id="nightShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
-    <div class="form-group"><label>休息日</label><input type="number" id="restDay" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>休息日出勤</label><input type="number" id="restDay" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
     <div class="form-group"><label>國定(日)</label><input type="number" id="natDay" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
     <div class="form-group"><label>國定(夜)</label><input type="number" id="natNight" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
     <div class="form-group"><label>國定(休)</label><input type="number" id="natOff" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
@@ -108,7 +108,7 @@
     <div id="result-area">
         <div class="result-item"><div class="label-group"><span>日班</span><span class="sub-text" id="day-deduct-msg"></span></div><span id="res-dayShift">0</span></div>
         <div class="result-item"><div class="label-group"><span>夜班</span><span class="sub-text" id="night-deduct-msg"></span></div><span id="res-nightShift">0</span></div>
-        <div class="result-item"><span>休息日：</span><span id="res-restDay">0</span></div>
+        <div class="result-item"><span>休息日出勤：</span><span id="res-restDay">0</span></div>
         <div class="result-item"><span>國定(日)：</span><span id="res-natDay">0</span></div>
         <div class="result-item"><span>國定(夜)：</span><span id="res-natNight">0</span></div>
         <div class="result-item"><span>國定(休)：</span><span id="res-natOff">0</span></div>
