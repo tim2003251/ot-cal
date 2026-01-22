@@ -14,26 +14,32 @@
     
     <title>加班費試算系統</title>
     <style>
-        /* ==== 全局設定 ==== */
+        /* ==== 基礎設定 ==== */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f2f2f7;
             display: flex;
             justify-content: center;
-            padding: env(safe-area-inset-top) 15px 20px 15px; /* 稍微減少左右留白 */
             margin: 0;
             -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
             box-sizing: border-box;
+            
+            /* 安全的邊距寫法 (防止舊手機看不懂導致白畫面) */
+            padding: 20px;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: 20px;
         }
 
         .container {
             background-color: white;
             padding: 20px;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); /* 讓陰影更有質感 */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             width: 100%;
             max-width: 500px;
+            /* 確保底部不被遮擋 */
+            margin-bottom: 50px; 
             margin-bottom: calc(20px + env(safe-area-inset-bottom));
         }
 
@@ -46,4 +52,251 @@
         }
 
         .section-title { 
-            background-color: #f2f2f7;
+            background-color: #f2f2f7; 
+            padding: 8px 12px; 
+            margin: 25px 0 12px 0;
+            border-radius: 8px; 
+            font-weight: 600; 
+            color: #636366; 
+            font-size: 14px; 
+        }
+
+        /* ==== 表單設定 ==== */
+        .form-group { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 12px 0; 
+            border-bottom: 1px solid #e5e5ea; 
+        }
+
+        /* 月薪欄位專用：無底線 */
+        .form-group.no-border {
+            border-bottom: none;
+            padding-bottom: 5px;
+        }
+
+        .form-group label { 
+            flex: 1; 
+            color: #000; 
+            font-weight: 500; 
+            font-size: 16px;
+            white-space: nowrap; /* 強制不換行 */
+        }
+
+        .form-group input { 
+            flex: 1;
+            max-width: 140px; /* 限制寬度 */
+            padding: 8px; 
+            border: none; 
+            background: #f2f2f7; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            text-align: right; 
+            color: #007aff; 
+            font-weight: bold; 
+        }
+        
+        .form-group input:focus { 
+            background: #e4e4ed; 
+            outline: none;
+        }
+
+        .form-group span.unit { 
+            margin-left: 8px; 
+            color: #8e8e93; 
+            font-size: 15px; 
+            width: 20px; 
+            text-align: right; 
+        }
+
+        /* ==== 時薪顯示 (含底線) ==== */
+        .hourly-display { 
+            font-size: 13px; 
+            color: #8e8e93; 
+            text-align: right; 
+            margin-top: 0; 
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e5ea; /* 線條在這裡 */
+            padding-right: 32px; /* 對齊數字 */
+        }
+
+        .info-text { 
+            font-size: 13px; 
+            color: #ff3b30; 
+            margin-bottom: 15px; 
+            line-height: 1.4; 
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background-color: #007aff; 
+            color: white; 
+            border: none; 
+            border-radius: 14px; 
+            font-size: 18px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 30px; 
+            box-shadow: 0 4px 10px rgba(0,122,255,0.3); 
+        }
+        button:active { opacity: 0.8; transform: scale(0.98); }
+
+        /* ==== 結果顯示 ==== */
+        #result-area { 
+            margin-top: 25px; 
+            padding: 20px; 
+            background-color: #f9f9f9; 
+            border-radius: 16px; 
+            display: none; 
+            border: 1px solid #f0f0f0; 
+        }
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            font-size: 16px; 
+            color: #333; 
+        }
+        .result-item .sub-text { 
+            font-size: 12px; 
+            color: #8e8e93; 
+            display: block; 
+            margin-top: 2px;
+        }
+        .result-total { 
+            margin-top: 20px; 
+            padding-top: 15px; 
+            border-top: 2px dashed #e5e5ea; 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: #ff3b30; 
+        }
+
+        /* ==== 手機小螢幕適配 ==== */
+        @media (max-width: 380px) {
+            .container { padding: 15px; }
+            .form-group label { font-size: 15px; }
+            .form-group input { font-size: 16px; max-width: 110px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>加班費試算</h2>
+
+    <div class="section-title" style="margin-top: 0;">薪資設定</div>
+    
+    <div class="form-group no-border">
+        <label for="salary">月薪</label>
+        <input type="number" id="salary" inputmode="numeric" pattern="[0-9]*" placeholder="0" oninput="saveSalaryAndCalc()">
+        <span class="unit">元</span>
+    </div>
+    <div class="hourly-display">(換算時薪: <span id="displayHourly">0</span> 元)</div>
+
+    <div class="section-title">出勤天數 (請填總數)</div>
+    <div class="info-text">*系統將自動扣除重複的休息日出勤/國定假日</div>
+    
+    <div class="form-group"><label>日班 (總數)</label><input type="number" id="dayShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>夜班 (總數)</label><input type="number" id="nightShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>休息日出勤</label><input type="number" id="restDay" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>國定(日)</label><input type="number" id="natDay" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>國定(夜)</label><input type="number" id="natNight" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+    <div class="form-group"><label>國定(休)</label><input type="number" id="natOff" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
+
+    <button onclick="calculateOT()">開始計算</button>
+
+    <div id="result-area">
+        <div class="result-item">
+            <div class="label-group"><span>日班加班費</span><span class="sub-text" id="day-deduct-msg"></span></div>
+            <span id="res-dayShift">0</span>
+        </div>
+        <div class="result-item">
+            <div class="label-group"><span>夜班加班費</span><span class="sub-text" id="night-deduct-msg"></span></div>
+            <span id="res-nightShift">0</span>
+        </div>
+        <div class="result-item"><span>休息日出勤</span><span id="res-restDay">0</span></div>
+        <div class="result-item"><span>國定(日)</span><span id="res-natDay">0</span></div>
+        <div class="result-item"><span>國定(夜)</span><span id="res-natNight">0</span></div>
+        <div class="result-item"><span>國定(休)</span><span id="res-natOff">0</span></div>
+        <div class="result-total"><span>總計</span><span id="res-total">0 元</span></div>
+    </div>
+</div>
+
+<script>
+    // PWA Service Worker 註冊
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
+        });
+    }
+
+    // 載入時讀取舊資料
+    window.addEventListener('load', () => {
+        let savedSalary = localStorage.getItem('userSalary');
+        if (savedSalary) {
+            document.getElementById('salary').value = savedSalary;
+            updateHourlyRate();
+        }
+    });
+
+    // 儲存並計算
+    function saveSalaryAndCalc() {
+        let val = document.getElementById('salary').value;
+        localStorage.setItem('userSalary', val);
+        updateHourlyRate();
+    }
+
+    function getVal(id) { return parseFloat(document.getElementById(id).value) || 0; }
+    
+    function updateHourlyRate() { 
+        let salary = getVal('salary'); 
+        let hourly = salary / 240; 
+        document.getElementById('displayHourly').innerText = hourly.toFixed(2); 
+    }
+    
+    function calculateOT() {
+        let salary = getVal('salary'); if (salary <= 0) { alert("請輸入月薪"); return; }
+        let hourly = salary / 240;
+        let dayShiftDays = getVal('dayShift'); let nightShiftDays = getVal('nightShift'); let restDayDays = getVal('restDay');
+        let natDayDays = getVal('natDay'); let natNightDays = getVal('natNight'); let natOffDays = getVal('natOff');
+        
+        // 核心扣除邏輯
+        let dayDeductCount = natDayDays + restDayDays;
+        let actualDayShiftDays = Math.max(0, dayShiftDays - dayDeductCount);
+        let nightDeductCount = natNightDays;
+        let actualNightShiftDays = Math.max(0, nightShiftDays - nightDeductCount);
+
+        if (dayDeductCount > 0) document.getElementById('day-deduct-msg').innerText = `(已扣${dayDeductCount}天)`; else document.getElementById('day-deduct-msg').innerText = ``;
+        if (nightDeductCount > 0) document.getElementById('night-deduct-msg').innerText = `(已扣${nightDeductCount}天)`; else document.getElementById('night-deduct-msg').innerText = ``;
+
+        // 金額計算
+        let payDayShift = Math.round(actualDayShiftDays * (hourly * (4/3) * 1.2));
+        let payNightShift = Math.round(actualNightShiftDays * (hourly * (4/3) * 1.2));
+        let payRestDay = Math.round(restDayDays * (hourly * (62/3)));
+        let payNatDay = Math.round(natDayDays * (hourly * (37/3)));
+        let payNatNight = Math.round(natNightDays * (hourly * (37/3)));
+        let payNatOff = Math.round(natOffDays * (hourly * 8));
+
+        let total = payDayShift + payNightShift + payRestDay + payNatDay + payNatNight + payNatOff;
+
+        document.getElementById('res-dayShift').innerText = payDayShift.toLocaleString();
+        document.getElementById('res-nightShift').innerText = payNightShift.toLocaleString();
+        document.getElementById('res-restDay').innerText = payRestDay.toLocaleString();
+        document.getElementById('res-natDay').innerText = payNatDay.toLocaleString();
+        document.getElementById('res-natNight').innerText = payNatNight.toLocaleString();
+        document.getElementById('res-natOff').innerText = payNatOff.toLocaleString();
+        document.getElementById('res-total').innerText = total.toLocaleString() + " 元";
+        document.getElementById('result-area').style.display = 'block';
+    }
+</script>
+</body>
+</html>
