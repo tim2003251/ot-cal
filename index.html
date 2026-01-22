@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#f2f2f7">
     
     <link rel="manifest" href="manifest.json">
@@ -14,24 +14,177 @@
     
     <title>加班費試算系統</title>
     <style>
-        /* CSS 樣式區域 */
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f2f2f7; display: flex; justify-content: center; padding: 20px; margin: 0; -webkit-tap-highlight-color: transparent; }
-        .container { background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); width: 100%; max-width: 500px; margin-bottom: 50px; }
-        h2 { text-align: center; color: #1c1c1e; margin-bottom: 20px; font-size: 22px; font-weight: 600; }
-        .section-title { background-color: #e5e5ea; padding: 8px 12px; margin: 20px 0 10px 0; border-radius: 8px; font-weight: 600; color: #3a3a3c; font-size: 14px; }
-        .form-group { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .form-group label { flex: 1; font-size: 16px; color: #000; }
-        .form-group input { flex: 0.8; padding: 8px; border: none; background: #f2f2f7; border-radius: 6px; font-size: 18px; text-align: right; color: #007aff; font-weight: bold; }
-        .form-group span.unit { margin-left: 8px; color: #8e8e93; font-size: 14px; width: 20px; }
-        .info-text { font-size: 13px; color: #ff3b30; margin-top: -5px; margin-bottom: 15px; line-height: 1.4; }
-        button { width: 100%; padding: 15px; background-color: #007aff; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 25px; box-shadow: 0 4px 6px rgba(0,122,255,0.2); }
-        button:active { background-color: #0063cc; transform: scale(0.98); }
-        #result-area { margin-top: 25px; padding: 15px; background-color: #f2f2f7; border-radius: 12px; display: none; }
-        .result-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 15px; color: #333; }
-        .result-item .label-group { display: flex; flex-direction: column; }
-        .result-item .sub-text { font-size: 11px; color: #888; }
-        .result-total { margin-top: 15px; padding-top: 15px; border-top: 1px solid #c7c7cc; display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; color: #ff3b30; }
-        .hourly-display { font-size: 13px; color: #8e8e93; text-align: right; margin-top: -5px; margin-bottom: 15px; }
+        /* 修正 1: 全域盒模型設定，防止跑版 */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f2f2f7;
+            display: flex;
+            justify-content: center;
+            /* 修正 2: 減少手機版的外圍留白，讓畫面更滿 */
+            padding: 15px; 
+            margin: 0;
+            min-height: 100vh; /* 確保高度撐滿 */
+            -webkit-tap-highlight-color: transparent;
+            /* 修正 3: 針對 iPhone X 以上機種的安全區域設定 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .container {
+            background-color: white;
+            /* 修正 4: 內部留白稍微縮小，增加可視空間 */
+            padding: 20px; 
+            border-radius: 16px; /* 圓角更圓潤 */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 500px;
+            /* 讓容器高度適應內容，不要太長 */
+            height: fit-content; 
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1c1c1e;
+            margin: 10px 0 20px 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            background-color: #f2f2f7;
+            padding: 10px 12px;
+            margin: 15px 0 10px 0;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #636366;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 0; /* iOS 風格列表通常緊湊 */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e5ea;
+            padding: 12px 0;
+        }
+        
+        /* 最後一個欄位不要底線 */
+        .form-group:last-of-type {
+            border-bottom: none;
+        }
+
+        .form-group label {
+            flex: 1;
+            font-size: 16px;
+            color: #1c1c1e;
+        }
+
+        .form-group input {
+            width: 100px; /* 固定輸入框寬度避免太寬 */
+            padding: 8px;
+            border: none;
+            background: rgba(118, 118, 128, 0.12); /* 淺灰色背景 */
+            border-radius: 8px;
+            font-size: 17px; /* iOS 預設字體大小，防止點擊時自動縮放 */
+            text-align: center;
+            color: #007aff;
+            font-weight: 600;
+            outline: none;
+        }
+        
+        .form-group input:focus {
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        .form-group span.unit {
+            margin-left: 8px;
+            color: #8e8e93;
+            font-size: 14px;
+            width: 20px;
+            text-align: right;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #ff3b30;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            background-color: #0063cc;
+            transform: scale(0.98);
+        }
+
+        #result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f2f2f7;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .result-item .label-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-item .sub-text {
+            font-size: 11px;
+            color: #8e8e93;
+        }
+
+        .result-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #d1d1d6;
+            display: flex;
+            justify-content: space-between;
+            font-size: 22px;
+            font-weight: 700;
+            color: #ff3b30;
+        }
+
+        .hourly-display {
+            font-size: 13px;
+            color: #8e8e93;
+            text-align: right;
+            margin-top: -5px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -48,7 +201,7 @@
     <div class="hourly-display">(時薪: <span id="displayHourly">0</span> 元)</div>
 
     <div class="section-title">出勤天數 (填寫總數)</div>
-    <div class="info-text">*系統會自動從「日班」中扣除重複的「休息日」與「國定假日(日)」</div>
+    <div class="info-text">*系統會自動扣除重複的休息日/國定假日</div>
     
     <div class="form-group"><label>日班 (總數)</label><input type="number" id="dayShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
     <div class="form-group"><label>夜班 (總數)</label><input type="number" id="nightShift" inputmode="numeric" placeholder="0"><span class="unit">天</span></div>
@@ -71,7 +224,6 @@
 </div>
 
 <script>
-    // 註冊 Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -80,19 +232,17 @@
         });
     }
 
-    // 1. 頁面載入時：讀取已儲存的月薪
     window.addEventListener('load', () => {
-        let savedSalary = localStorage.getItem('userSalary'); // 從本機儲存取出
+        let savedSalary = localStorage.getItem('userSalary');
         if (savedSalary) {
             document.getElementById('salary').value = savedSalary;
-            updateHourlyRate(); // 順便更新時薪顯示
+            updateHourlyRate();
         }
     });
 
-    // 2. 當使用者輸入月薪時：同時儲存並更新時薪
     function saveSalaryAndCalc() {
         let val = document.getElementById('salary').value;
-        localStorage.setItem('userSalary', val); // 寫入本機儲存
+        localStorage.setItem('userSalary', val);
         updateHourlyRate();
     }
 
