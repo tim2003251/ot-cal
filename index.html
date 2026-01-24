@@ -226,6 +226,8 @@
         <div class="result-item"><span>國定(夜)</span><span id="res-natNight">0</span></div>
         <div class="result-item"><span>國定(休)</span><span id="res-natOff">0</span></div>
         <div class="result-total"><span>總計</span><span id="res-total">0 元</span></div>
+        <div class="result-total" style="border-top: none; margin-top: 0; padding-top: 5px; color: #007aff;"><span>夜點費</span><span id="res-nightAllowance">0 元</span>
+</div>
     </div>
 </div>
 
@@ -287,7 +289,8 @@
         let payNatOff = Math.round(natOffDays * (hourly * 8));
 
         let total = payDayShift + payNightShift + payRestDay + payNatDay + payNatNight + payNatOff;
-
+        let nightAllowance = nightShiftDays * 400;
+        
         document.getElementById('res-dayShift').innerText = payDayShift.toLocaleString();
         document.getElementById('res-nightShift').innerText = payNightShift.toLocaleString();
         document.getElementById('res-restDay').innerText = payRestDay.toLocaleString();
@@ -295,9 +298,11 @@
         document.getElementById('res-natNight').innerText = payNatNight.toLocaleString();
         document.getElementById('res-natOff').innerText = payNatOff.toLocaleString();
         document.getElementById('res-total').innerText = total.toLocaleString() + " 元";
+        document.getElementById('res-nightAllowance').innerText = nightAllowance.toLocaleString() + " 元";
         document.getElementById('result-area').style.display = 'block';
     }
 </script>
 </body>
 
 </html>
+
