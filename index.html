@@ -276,10 +276,16 @@
     }
     
     function calculateOT() {
-        let salary = getVal('salary'); if (salary <= 0) { alert("請輸入月薪"); return; }
+        let salary = getVal('salary'); 
+        if (salary <= 0) { alert("請輸入月薪"); return; }
+        
         let hourly = salary / 240;
-        let dayShiftDays = getVal('dayShift'); let nightShiftDays = getVal('nightShift'); let restDayDays = getVal('restDay');
-        let natDayDays = getVal('natDay'); let natNightDays = getVal('natNight'); let natOffDays = getVal('natOff');
+        let dayShiftDays = getVal('dayShift'); 
+        let nightShiftDays = getVal('nightShift'); 
+        let restDayDays = getVal('restDay');
+        let natDayDays = getVal('natDay'); 
+        let natNightDays = getVal('natNight'); 
+        let natOffDays = getVal('natOff');
         
         // 核心扣除邏輯
         let dayDeductCount = natDayDays + restDayDays;
@@ -287,26 +293,44 @@
         let nightDeductCount = natNightDays;
         let actualNightShiftDays = Math.max(0, nightShiftDays - nightDeductCount);
 
-        if (dayDeductCount > 0) document.getElementById('day-deduct-msg').innerText = `(已扣${dayDeductCount}天)`; else document.getElementById('day-deduct-msg').innerText = ``;
-        if (nightDeductCount > 0) document.getElementById('night-deduct-msg').innerText = `(已扣${nightDeductCount}天)`; else document.getElementById('night-deduct-msg').innerText = ``;
+        if (dayDeductCount > 0) document.getElementById('day-deduct-msg').innerText = `(已扣${dayDeductCount}天)`; 
+        else document.getElementById('day-deduct-msg').innerText = ``;
+        
+        if (nightDeductCount > 0) document.getElementById('night-deduct-msg').innerText = `(已扣${nightDeductCount}天)`; 
+        else document.getElementById('night-deduct-msg').innerText = ``;
 
-        // 金額計算
-        let payDayShift = Math.round(actualDayShiftDays * (hourly * (4/3) * 1.2));
-        let payNightShift = Math.round(actualNightShiftDays * (hourly * (4/3) * 1.2));
-        let payRestDay = Math.round(restDayDays * (hourly * (62/3)));
-        let payNatDay = Math.round(natDayDays * (hourly * (37/3)));
-        let payNatNight = Math.round(natNightDays * (hourly * (37/3)));
-        let payNatOff = Math.round(natOffDays * (hourly * 8));
+        // --- 金額計算邏輯修改開始 ---
+        
+        // 1. 先計算原始金額（保留小數，不進行四捨五入）
+        let rawDayShift = actualDayShiftDays * (hourly * (4/3) * 1.2);
+        let rawNightShift = actualNightShiftDays * (hourly * (4/3) * 1.2);
+        let rawRestDay = restDayDays * (hourly * (62/3));
+        let rawNatDay = natDayDays * (hourly * (37/3));
+        let rawNatNight = natNightDays * (hourly * (37/3));
+        let rawNatOff = natOffDays * (hourly * 8);
 
-        let total = payDayShift + payNightShift + payRestDay + payNatDay + payNatNight + payNatOff;
+        // 2. 計算總計：使用原始金額加總後再四捨五入
+        let total = Math.round(rawDayShift + rawNightShift + rawRestDay + rawNatDay + rawNatNight + rawNatOff);
+        
+        // 3. 為了畫面顯示的美觀，細項依然顯示四捨五入後的整數
+        let displayDayShift = Math.round(rawDayShift);
+        let displayNightShift = Math.round(rawNightShift);
+        let displayRestDay = Math.round(rawRestDay);
+        let displayNatDay = Math.round(rawNatDay);
+        let displayNatNight = Math.round(rawNatNight);
+        let displayNatOff = Math.round(rawNatOff);
+
         let nightAllowance = nightShiftDays * 400;
         
-        document.getElementById('res-dayShift').innerText = payDayShift.toLocaleString();
-        document.getElementById('res-nightShift').innerText = payNightShift.toLocaleString();
-        document.getElementById('res-restDay').innerText = payRestDay.toLocaleString();
-        document.getElementById('res-natDay').innerText = payNatDay.toLocaleString();
-        document.getElementById('res-natNight').innerText = payNatNight.toLocaleString();
-        document.getElementById('res-natOff').innerText = payNatOff.toLocaleString();
+        // 4. 更新畫面
+        document.getElementById('res-dayShift').innerText = displayDayShift.toLocaleString();
+        document.getElementById('res-nightShift').innerText = displayNightShift.toLocaleString();
+        document.getElementById('res-restDay').innerText = displayRestDay.toLocaleString();
+        document.getElementById('res-natDay').innerText = displayNatDay.toLocaleString();
+        document.getElementById('res-natNight').innerText = displayNatNight.toLocaleString();
+        document.getElementById('res-natOff').innerText = displayNatOff.toLocaleString();
+        
+        // 顯示最後加總後的結果
         document.getElementById('res-total').innerText = total.toLocaleString() + " 元";
         document.getElementById('res-nightAllowance').innerText = nightAllowance.toLocaleString() + " 元";
         document.getElementById('result-area').style.display = 'block';
@@ -315,5 +339,6 @@
 </body>
 
 </html>
+
 
 
