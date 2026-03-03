@@ -310,7 +310,7 @@
         let rawNatOff = natOffDays * (hourly * 8);
 
         // 2. 計算總計：使用原始金額加總後再四捨五入
-        let total = Math.round(rawDayShift + rawNightShift + rawRestDay + rawNatDay + rawNatNight + rawNatOff);
+        let total = Math.ceil(rawDayShift + rawNightShift + rawRestDay + rawNatDay + rawNatNight + rawNatOff);
         
         // 3. 為了畫面顯示的美觀，細項依然顯示四捨五入後的整數
         let displayDayShift = Math.round(rawDayShift);
@@ -339,6 +339,7 @@
 </body>
 
 </html>
+
 
 
 
